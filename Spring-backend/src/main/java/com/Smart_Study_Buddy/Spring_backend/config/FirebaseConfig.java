@@ -19,13 +19,17 @@ public class FirebaseConfig {
     @Value("${firebase.service-account-key}")
     private Resource serviceAccountKey;
 
+    @Value("${firebase.storage-bucket}")
+    private String storageBucket;
+
     @PostConstruct
-    public void initialize() throws IOException{
+    public void initialize() throws IOException {
         FirebaseOptions options = FirebaseOptions.builder()
-        .setCredentials(GoogleCredentials.fromStream(
-            serviceAccountKey.getInputStream()))
-            .build();
-        
+                .setCredentials(GoogleCredentials.fromStream(
+                        serviceAccountKey.getInputStream()))
+                .setStorageBucket(storageBucket)
+                .build();
+
         if (FirebaseApp.getApps().isEmpty()) {
             FirebaseApp.initializeApp(options);
         }

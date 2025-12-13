@@ -39,12 +39,15 @@ public class FirestoreService {
 
         ApiFuture<QuerySnapshot> future = firestore.collection("documents")
                 .whereEqualTo("userId", userId)
-                .orderBy("uploadDate", com.google.cloud.firestore.Query.Direction.DESCENDING).get();
+                .get();
 
         List<Map<String, Object>> document = new ArrayList<>();
         for (DocumentSnapshot doc : future.get().getDocuments()) {
             Map<String, Object> data = doc.getData();
-            document.add(data);
+            if (data != null) {
+                data.put("id", doc.getId());
+                document.add(data);
+            }
         }
         return document;
     }

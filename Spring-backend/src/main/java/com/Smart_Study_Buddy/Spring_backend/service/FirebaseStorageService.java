@@ -10,10 +10,8 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.beans.factory.annotation.Value;
 
 import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
-import com.google.cloud.storage.BlobInfo;
-import com.google.cloud.storage.Storage;
-import com.google.cloud.storage.StorageOptions;
+import com.google.cloud.storage.Bucket;
+import com.google.firebase.cloud.StorageClient;
 
 @Service
 public class FirebaseStorageService {
@@ -21,29 +19,23 @@ public class FirebaseStorageService {
     @Value("${firebase.storage-bucket}")
     private String bucketName;
 
-    private final Storage storage = StorageOptions.getDefaultInstance().getService();
-
     public String uploadFile(MultipartFile file, String userId) throws IOException {
 
         String filename = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
         String filePath = "users/" + userId + "/documents/" + filename;
 
-        BlobId blobId = BlobId.of(bucketName, filePath);
-        BlobInfo blobInfo = BlobInfo.newBuilder(blobId)
-                .setContentType(file.getContentType())
-                .build();
-
-        storage.create(blobInfo, file.getBytes());
+        Bucket bucket = StorageClient.getInstance().bucket();
+        bucket.create(filePath, file.getBytes(), file.getContentType());
 
         return filePath;
 
     }
 
     public String getDownloadUrl(String filePath) {
-        BlobId blobId = BlobId.of(bucketName, filePath);
-        Blob blob = storage.get(blobId);
+        Bucket bucket = StorageClient.getInstance().bucket();
+        Blob blob = bucket.get(filePath);
 
-        return blob.signUrl(7,TimeUnit.DAYS).toString();
+        return blob.signUrl(7, TimeUnit.DAYS).toString();
     }
 
 }
