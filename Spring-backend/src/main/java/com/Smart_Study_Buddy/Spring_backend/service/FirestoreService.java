@@ -51,4 +51,25 @@ public class FirestoreService {
         }
         return document;
     }
+
+    public Map<String, Object> getDocument(String documentId) throws ExecutionException, InterruptedException {
+        if (documentId == null) {
+            throw new IllegalArgumentException("Document ID cannot be null");
+        }
+
+        DocumentSnapshot document = firestore.collection("documents").document(documentId).get().get();
+
+        if (document.exists()) {
+            Map<String, Object> data = document.getData();
+            if (data != null) {
+                String docId = document.getId();
+                if (docId != null) {
+                    data.put("id", docId);
+                }
+                return data;
+            }
+        }
+
+        return null;
+    }
 }
