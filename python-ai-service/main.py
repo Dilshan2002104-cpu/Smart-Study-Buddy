@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="google.cloud.aiplatform.initializer")
+
 from fastapi import FastAPI, UploadFile,File,HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from services.pdf_service import extract_text_from_pdf
@@ -62,6 +65,4 @@ async def generate_flashcards(request: SummarizeRequest):
         return {"flashcards": flashcards, "count": len(flashcards)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-
-
-    
+        

@@ -72,4 +72,12 @@ public class FirestoreService {
 
         return null;
     }
+
+    public void deleteDocument(String documentId) throws ExecutionException, InterruptedException {
+        if (documentId == null) {
+            throw new IllegalArgumentException("Document ID cannot be null");
+        }
+
+        firestore.collection("documents").document(documentId).delete().get();
+    }
 }
