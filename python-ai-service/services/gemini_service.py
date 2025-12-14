@@ -33,23 +33,35 @@ class GeminiService:
         response = self.model.generate_content(prompt)
         return response.text
 
-    def answer_question(self, text: str, question: str) -> str:
-        """Answer questions in a friendly, helpful way"""
+    def answer_question(self, text: str, question: str, chat_history: list = None) -> str:
+        """Answer questions in a friendly, helpful way with conversation context"""
+        
+        # Build conversation context from chat history
+        conversation_context = ""
+        if chat_history and len(chat_history) > 0:
+            conversation_context = "\n\nPrevious conversation:\n"
+            for i, chat in enumerate(chat_history[-5:], 1):  # Include last 5 exchanges to keep context manageable
+                conversation_context += f"\nQ{i}: {chat.get('question', '')}\n"
+                conversation_context += f"A{i}: {chat.get('answer', '')}\n"
+            conversation_context += "\n---\n"
+        
         prompt = f"""You are a friendly study buddy helping a student understand their study material.
+        {conversation_context}
+        Current Question: {question}
         
-        Question: {question}
-        
-        Based on this document:
+        Document context (use this as reference, but feel free to expand with your knowledge):
         {text[:10000]}
         
-        Provide a clear, conversational answer that:
-        - Directly answers the question in simple terms
-        - Uses examples or analogies when helpful
-        - Breaks down complex ideas into easy-to-understand parts
-        - Sounds like a helpful friend explaining, not a textbook
-        - Keeps it concise but thorough
+        Provide a clear, helpful answer that:
+        - References previous conversation if relevant (e.g., "As we discussed earlier...")
+        - Uses the document as primary context when relevant
+        - Supplements with your broader knowledge to give a complete, useful answer
+        - Explains concepts clearly even if they're not fully covered in the document
+        - Uses examples, analogies, or additional context when helpful
+        - Sounds like a knowledgeable friend explaining, not just reading from the document
+        - Is educational and thorough, not just a brief excerpt
         
-        If the answer isn't in the document, say so politely and offer what related info you can."""
+        If the question is completely unrelated to the document, politely acknowledge that and still provide a helpful answer based on your knowledge."""
         
         response = self.model.generate_content(prompt)
         return response.text
@@ -92,3 +104,54 @@ class GeminiService:
             print(f"Response text: {text_response}")
             # Return a default flashcard if parsing fails
             return [{"question": "Error generating flashcards", "answer": "Please try again"}]
+    
+    def generate_quiz(self, text: str) -> list:
+        """Generate multiple-choice quiz questions"""
+        prompt = f"""You are creating a quiz for a student. Generate 10 multiple-choice questions from this document.
+        
+        Guidelines:
+        - Each question should have 4 options (A, B, C, D)
+        - Only ONE option should be correct
+        - Questions should test understanding, not just memorization
+        - Include a brief explanation for the correct answer
+        - Use clear, student-friendly language
+        - Mix difficulty levels (easy, medium, hard)
+        
+        Document:
+        {text[:10000]}
+        
+        Return ONLY a JSON array in this exact format (no other text):
+        [
+            {{
+                "question": "What is the main purpose of...",
+                "options": ["Option A text", "Option B text", "Option C text", "Option D text"],
+                "correctAnswer": 0,
+                "explanation": "Brief explanation why option A is correct"
+            }}
+        ]
+        
+        Note: correctAnswer is the index (0-3) of the correct option in the options array."""
+        
+        response = self.model.generate_content(prompt)
+        
+        # Clean response and parse JSON
+        text_response = response.text.strip()
+        
+        # Remove markdown code blocks if present
+        text_response = re.sub(r'```json\s*', '', text_response)
+        text_response = re.sub(r'```\s*', '', text_response)
+        text_response = text_response.strip()
+        
+        try:
+            quiz = json.loads(text_response)
+            return quiz
+        except json.JSONDecodeError as e:
+            print(f"JSON decode error: {e}")
+            print(f"Response text: {text_response}")
+            # Return a default question if parsing fails
+            return [{
+                "question": "Error generating quiz",
+                "options": ["Please try again", "Error occurred", "Unable to generate", "Try later"],
+                "correctAnswer": 0,
+                "explanation": "There was an error generating the quiz. Please try again."
+            }]

@@ -51,7 +51,11 @@ async def ask_question(request: QuestionRequest):
         """Answer question about document"""
 
         try:
-            answer = gemini_service.answer_question(request.text,request.question)
+            answer = gemini_service.answer_question(
+                request.text,
+                request.question,
+                request.chat_history
+            )
             return {"answer": answer, "question": request.question}
         except Exception as e:
             raise HTTPException(status_code=500,detail=str(e))
@@ -65,4 +69,12 @@ async def generate_flashcards(request: SummarizeRequest):
         return {"flashcards": flashcards, "count": len(flashcards)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-        
+
+@app.post("/api/ai/generate-quiz")
+async def generate_quiz(request: SummarizeRequest):
+    """Generate quiz questions from document"""
+    try:
+        quiz = gemini_service.generate_quiz(request.text)
+        return {"quiz": quiz, "count": len(quiz)}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

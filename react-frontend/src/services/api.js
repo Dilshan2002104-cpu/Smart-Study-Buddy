@@ -36,8 +36,11 @@ export const getUserDocuments = (userId) => {
 };
 
 // AI Features
-export const extractPdfTextFromStoragePath = (storagePath) => {
-    return axios.post(`${API_URL}/pdf/extract-from-storage-path`, { storagePath });
+export const extractPdfTextFromStoragePath = (storagePath, documentId) => {
+    return axios.post(`${API_URL}/pdf/extract-from-storage-path`, {
+        storagePath,
+        documentId
+    });
 };
 
 export const extractPdfText = (file) => {
@@ -53,16 +56,24 @@ export const summarizeDocument = (text, documentId) => {
     });
 };
 
-export const askQuestion = (text, question, documentId) => {
+export const askQuestion = (text, question, documentId, chatHistory = []) => {
     return axios.post(`${API_URL}/ai/ask`, {
         text,
         question,
-        document_id: documentId
+        document_id: documentId,
+        chat_history: chatHistory
     });
 };
 
 export const generateFlashcards = (text, documentId) => {
     return axios.post(`${API_URL}/ai/flashcards`, {
+        text,
+        document_id: documentId
+    });
+};
+
+export const generateQuiz = (text, documentId) => {
+    return axios.post(`${API_URL}/ai/generate-quiz`, {
         text,
         document_id: documentId
     });
@@ -76,6 +87,18 @@ export const getDocumentContent = (documentId, userId) => {
 
 export const deleteDocument = (documentId, userId) => {
     return axios.delete(`${API_URL}/documents/${documentId}`, {
+        params: { userId }
+    });
+};
+
+export const saveChatHistory = (documentId, userId, chatHistory) => {
+    return axios.post(`${API_URL}/documents/${documentId}/chat-history`, chatHistory, {
+        params: { userId }
+    });
+};
+
+export const getChatHistory = (documentId, userId) => {
+    return axios.get(`${API_URL}/documents/${documentId}/chat-history`, {
         params: { userId }
     });
 };

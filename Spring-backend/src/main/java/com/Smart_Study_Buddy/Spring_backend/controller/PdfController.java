@@ -1,5 +1,6 @@
 package com.Smart_Study_Buddy.Spring_backend.controller;
 
+import com.Smart_Study_Buddy.Spring_backend.service.FirestoreService;
 import com.google.cloud.storage.Blob;
 import com.google.cloud.storage.Bucket;
 import com.google.firebase.cloud.StorageClient;
@@ -19,11 +20,18 @@ public class PdfController {
 
     private final RestTemplate restTemplate = new RestTemplate();
     private final String AI_SERVICE_URL = "http://localhost:8000/api/ai";
+    private final FirestoreService firestoreService;
+
+    public PdfController(FirestoreService firestoreService) {
+        this.firestoreService = firestoreService;
+    }
 
     @PostMapping("/extract-from-storage-path")
     public ResponseEntity<?> extractTextFromStoragePath(@RequestBody Map<String, String> request) {
         try {
             String storagePath = request.get("storagePath");
+            String documentId = request.get("documentId");
+
             System.out.println("Downloading PDF from Firebase Storage: " + storagePath);
 
             // Download PDF directly from Firebase Storage using Admin SDK
@@ -58,6 +66,21 @@ public class PdfController {
                     Map.class);
 
             System.out.println("Text extraction successful!");
+
+            // Cache the extracted text in Firestore if documentId is provided
+            if (documentId != null && !documentId.isEmpty() && response.getBody() != null) {
+                String extractedText = (String) response.getBody().get("text");
+                if (extractedText != null && !extractedText.isEmpty()) {
+                    try {
+                        firestoreService.updateDocumentText(documentId, extractedText);
+                        System.out.println("✅ Cached extracted text in Firestore for document: " + documentId);
+                    } catch (Exception e) {
+                        System.err.println("⚠️ Failed to cache text: " + e.getMessage());
+                        // Don't fail the request if caching fails
+                    }
+                }
+            }
+
             return ResponseEntity.ok(response.getBody());
 
         } catch (Exception e) {

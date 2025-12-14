@@ -22,43 +22,51 @@ public class AiController {
     private final String AI_SERVICE_URL = "http://localhost:8000/api/ai";
 
     @PostMapping("/summarize")
-    public ResponseEntity<?> summarize(@RequestBody Map<String,String> request){
+    public ResponseEntity<?> summarize(@RequestBody Map<String, String> request) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String,String>> entity = new HttpEntity<>(request,headers);
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(request, headers);
 
         return restTemplate.postForEntity(
-            AI_SERVICE_URL + "/summarize",
-            entity,
-            String.class
-        );
+                AI_SERVICE_URL + "/summarize",
+                entity,
+                String.class);
     }
 
     @PostMapping("/ask")
-    public ResponseEntity<?> askQuestion(@RequestBody Map<String,String> request){
+    public ResponseEntity<?> askQuestion(@RequestBody Map<String, Object> request) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String,String>> entity = new HttpEntity<>(request,headers);
+        HttpEntity<Map<String, Object>> entity = new HttpEntity<>(request, headers);
 
         return restTemplate.postForEntity(
-            AI_SERVICE_URL + "/ask",
-            entity,
-            String.class
-        );
+                AI_SERVICE_URL + "/ask",
+                entity,
+                String.class);
     }
 
     @PostMapping("/flashcards")
-    public ResponseEntity<?> generateFlashcards(@RequestBody Map<String,String> request)
-    {
+    public ResponseEntity<?> generateFlashcards(@RequestBody Map<String, String> request) {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Map<String,String>> entity = new HttpEntity<>(request,headers);
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(request, headers);
 
         return restTemplate.postForEntity(
-            AI_SERVICE_URL + "/flashcards",
-            entity,
-            String.class
-        );
+                AI_SERVICE_URL + "/flashcards",
+                entity,
+                String.class);
+    }
+
+    @PostMapping("/generate-quiz")
+    public ResponseEntity<?> generateQuiz(@RequestBody Map<String, String> request) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Map<String, String>> entity = new HttpEntity<>(request, headers);
+
+        return restTemplate.postForEntity(
+                AI_SERVICE_URL + "/generate-quiz",
+                entity,
+                String.class);
     }
 
 }

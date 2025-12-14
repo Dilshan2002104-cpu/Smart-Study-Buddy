@@ -4,6 +4,7 @@ import Register from './components/Register';
 import Dashboard from './components/Dashboard';
 import DocumentViewer from './components/DocumentViewer';
 import Flashcards from './components/Flashcards';
+import Quiz from './components/Quiz';
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -33,6 +34,14 @@ function App() {
           element={
             <ProtectedRoute>
               <Flashcards />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quiz/:documentId"
+          element={
+            <ProtectedRoute>
+              <Quiz />
             </ProtectedRoute>
           }
         />

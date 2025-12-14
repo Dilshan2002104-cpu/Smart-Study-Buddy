@@ -80,4 +80,44 @@ public class FirestoreService {
 
         firestore.collection("documents").document(documentId).delete().get();
     }
+
+    public void updateDocumentText(String documentId, String extractedText)
+            throws ExecutionException, InterruptedException {
+        if (documentId == null) {
+            throw new IllegalArgumentException("Document ID cannot be null");
+        }
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("extractedText", extractedText);
+        updates.put("textExtractedAt", new Date());
+
+        firestore.collection("documents").document(documentId).update(updates).get();
+    }
+
+    public void saveChatHistory(String documentId, String userId, List<Map<String, String>> chatHistory)
+            throws ExecutionException, InterruptedException {
+        Map<String, Object> chatData = new HashMap<>();
+        chatData.put("documentId", documentId);
+        chatData.put("userId", userId);
+        chatData.put("chatHistory", chatHistory);
+        chatData.put("lastUpdated", new Date());
+
+        firestore.collection("chatHistory").document(documentId + "_" + userId).set(chatData).get();
+    }
+
+    public List<Map<String, String>> getChatHistory(String documentId, String userId)
+            throws ExecutionException, InterruptedException {
+        DocumentSnapshot doc = firestore.collection("chatHistory")
+                .document(documentId + "_" + userId)
+                .get()
+                .get();
+
+        if (doc.exists() && doc.getData() != null) {
+            Object chatHistoryObj = doc.getData().get("chatHistory");
+            if (chatHistoryObj instanceof List) {
+                return (List<Map<String, String>>) chatHistoryObj;
+            }
+        }
+        return new ArrayList<>();
+    }
 }
