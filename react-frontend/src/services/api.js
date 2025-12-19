@@ -2,6 +2,36 @@ import axios from "axios";
 
 const API_URL = "http://localhost:8080/api";
 
+// Create axios instance
+const apiClient = axios.create({
+    baseURL: API_URL
+});
+
+// Add request interceptor to attach authentication token
+apiClient.interceptors.request.use(
+    (config) => {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        const token = user.customToken; // Backend returns 'customToken', not 'token'
+
+        console.log('🔍 Interceptor Debug:');
+        console.log('  User object:', user);
+        console.log('  Token:', token);
+        console.log('  Token exists:', !!token);
+
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+            console.log('  ✅ Authorization header set:', config.headers.Authorization);
+        } else {
+            console.log('  ❌ No token found in localStorage!');
+        }
+
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
 export const registerUser = (username, email, password) => {
     return axios.post(`${API_URL}/auth/register`, {
         username,
@@ -22,7 +52,7 @@ export const uploadFile = (file, userId) => {
     formData.append('file', file);
     formData.append('userId', userId);
 
-    return axios.post(`${API_URL}/documents/upload`, formData, {
+    return apiClient.post('/documents/upload', formData, {
         headers: {
             "Content-Type": "multipart/form-data"
         }
@@ -30,14 +60,14 @@ export const uploadFile = (file, userId) => {
 };
 
 export const getUserDocuments = (userId) => {
-    return axios.get(`${API_URL}/documents`, {
+    return apiClient.get('/documents', {
         params: { userId }
     });
 };
 
 // AI Features
 export const extractPdfTextFromStoragePath = (storagePath, documentId) => {
-    return axios.post(`${API_URL}/pdf/extract-from-storage-path`, {
+    return apiClient.post('/pdf/extract-from-storage-path', {
         storagePath,
         documentId
     });
@@ -50,14 +80,14 @@ export const extractPdfText = (file) => {
 };
 
 export const summarizeDocument = (text, documentId) => {
-    return axios.post(`${API_URL}/ai/summarize`, {
+    return apiClient.post('/ai/summarize', {
         text,
         document_id: documentId
     });
 };
 
 export const askQuestion = (text, question, documentId, chatHistory = []) => {
-    return axios.post(`${API_URL}/ai/ask`, {
+    return apiClient.post('/ai/ask', {
         text,
         question,
         document_id: documentId,
@@ -66,39 +96,39 @@ export const askQuestion = (text, question, documentId, chatHistory = []) => {
 };
 
 export const generateFlashcards = (text, documentId) => {
-    return axios.post(`${API_URL}/ai/flashcards`, {
+    return apiClient.post('/ai/flashcards', {
         text,
         document_id: documentId
     });
 };
 
 export const generateQuiz = (text, documentId) => {
-    return axios.post(`${API_URL}/ai/generate-quiz`, {
+    return apiClient.post('/ai/generate-quiz', {
         text,
         document_id: documentId
     });
 };
 
 export const getDocumentContent = (documentId, userId) => {
-    return axios.get(`${API_URL}/documents/${documentId}/content`, {
+    return apiClient.get(`/documents/${documentId}/content`, {
         params: { userId }
     });
 };
 
 export const deleteDocument = (documentId, userId) => {
-    return axios.delete(`${API_URL}/documents/${documentId}`, {
+    return apiClient.delete(`/documents/${documentId}`, {
         params: { userId }
     });
 };
 
 export const saveChatHistory = (documentId, userId, chatHistory) => {
-    return axios.post(`${API_URL}/documents/${documentId}/chat-history`, chatHistory, {
+    return apiClient.post(`/documents/${documentId}/chat-history`, chatHistory, {
         params: { userId }
     });
 };
 
 export const getChatHistory = (documentId, userId) => {
-    return axios.get(`${API_URL}/documents/${documentId}/chat-history`, {
+    return apiClient.get(`/documents/${documentId}/chat-history`, {
         params: { userId }
     });
 };

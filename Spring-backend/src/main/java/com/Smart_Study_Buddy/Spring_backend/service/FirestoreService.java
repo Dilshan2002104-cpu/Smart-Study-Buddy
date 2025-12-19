@@ -112,10 +112,15 @@ public class FirestoreService {
                 .get()
                 .get();
 
-        if (doc.exists() && doc.getData() != null) {
-            Object chatHistoryObj = doc.getData().get("chatHistory");
-            if (chatHistoryObj instanceof List) {
-                return (List<Map<String, String>>) chatHistoryObj;
+        if (doc.exists()) {
+            Map<String, Object> data = doc.getData();
+            if (data != null) {
+                Object chatHistoryObj = data.get("chatHistory");
+                if (chatHistoryObj instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, String>> chatHistory = (List<Map<String, String>>) chatHistoryObj;
+                    return chatHistory;
+                }
             }
         }
         return new ArrayList<>();

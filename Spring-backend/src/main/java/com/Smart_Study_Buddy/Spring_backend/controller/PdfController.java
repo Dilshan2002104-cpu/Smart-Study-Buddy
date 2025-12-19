@@ -60,10 +60,13 @@ public class PdfController {
             HttpEntity<LinkedMultiValueMap<String, Object>> entity = new HttpEntity<>(body, headers);
 
             System.out.println("Sending PDF to Python service for text extraction...");
-            ResponseEntity<Map> response = restTemplate.postForEntity(
+            @SuppressWarnings("unchecked")
+            Class<Map<String, Object>> responseType = (Class<Map<String, Object>>) (Class<?>) Map.class;
+            ResponseEntity<Map<String, Object>> response = restTemplate.postForEntity(
                     AI_SERVICE_URL + "/extract-text",
                     entity,
-                    Map.class);
+                    responseType);
+
 
             System.out.println("Text extraction successful!");
 
