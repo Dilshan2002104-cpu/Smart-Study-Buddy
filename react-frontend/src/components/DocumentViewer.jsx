@@ -123,14 +123,53 @@ const DocumentViewer = () => {
         }
     };
 
-    // Helper function to render formatted text
+    // Helper function to render formatted text with markdown support
     const renderFormattedText = (text) => {
+        // Helper to process inline markdown (bold, italic, code)
+        const processInlineMarkdown = (line) => {
+            const parts = [];
+            let currentText = line;
+            let key = 0;
+
+            // Process bold text (***text*** or **text**)
+            const boldRegex = /(\*\*\*(.+?)\*\*\*|\*\*(.+?)\*\*)/g;
+            let lastIndex = 0;
+            let match;
+
+            while ((match = boldRegex.exec(currentText)) !== null) {
+                // Add text before the match
+                if (match.index > lastIndex) {
+                    parts.push(currentText.substring(lastIndex, match.index));
+                }
+                // Add bold text
+                const boldText = match[2] || match[3]; // Get content from either *** or **
+                parts.push(
+                    <strong key={`bold-${key++}`} className="font-bold text-indigo-900">
+                        {boldText}
+                    </strong>
+                );
+                lastIndex = match.index + match[0].length;
+            }
+
+            // Add remaining text
+            if (lastIndex < currentText.length) {
+                parts.push(currentText.substring(lastIndex));
+            }
+
+            return parts.length > 0 ? parts : currentText;
+        };
+
         return text.split('\n').map((line, idx) => {
             const trimmed = line.trim();
 
-            // Headings (bold text between **)
-            if (trimmed.match(/^\*\*(.+)\*\*$/)) {
-                const heading = trimmed.replace(/\*\*/g, '');
+            // Skip empty lines
+            if (!trimmed) {
+                return <div key={idx} className="h-2" />;
+            }
+
+            // Headings (lines that are entirely bold)
+            if (trimmed.match(/^\*\*\*(.+)\*\*\*$/) || trimmed.match(/^\*\*(.+)\*\*$/)) {
+                const heading = trimmed.replace(/\*\*\*/g, '').replace(/\*\*/g, '');
                 return (
                     <h4 key={idx} className="text-lg font-bold text-indigo-800 mt-4 mb-2">
                         {heading}
@@ -139,22 +178,36 @@ const DocumentViewer = () => {
             }
 
             // Bullet points
-            if (trimmed.startsWith('*') || trimmed.startsWith('-')) {
-                const bulletText = trimmed.replace(/^[\*\-]\s*/, '');
+            if (trimmed.startsWith('*') && !trimmed.startsWith('**')) {
+                const bulletText = trimmed.replace(/^\*\s*/, '');
                 return bulletText ? (
                     <div key={idx} className="flex gap-2 ml-4 mb-1">
                         <span className="text-indigo-600 font-bold mt-1">•</span>
-                        <p className="flex-1 text-gray-700">{bulletText}</p>
+                        <p className="flex-1 text-gray-700">
+                            {processInlineMarkdown(bulletText)}
+                        </p>
                     </div>
                 ) : null;
             }
 
-            // Regular paragraphs
-            return trimmed ? (
-                <p key={idx} className="text-gray-700 mb-2">
-                    {line}
+            if (trimmed.startsWith('-')) {
+                const bulletText = trimmed.replace(/^-\s*/, '');
+                return bulletText ? (
+                    <div key={idx} className="flex gap-2 ml-4 mb-1">
+                        <span className="text-indigo-600 font-bold mt-1">•</span>
+                        <p className="flex-1 text-gray-700">
+                            {processInlineMarkdown(bulletText)}
+                        </p>
+                    </div>
+                ) : null;
+            }
+
+            // Regular paragraphs with inline markdown
+            return (
+                <p key={idx} className="text-gray-700 mb-2 leading-relaxed">
+                    {processInlineMarkdown(line)}
                 </p>
-            ) : <div key={idx} className="h-2" />;
+            );
         });
     };
 
