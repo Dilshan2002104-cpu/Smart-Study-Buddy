@@ -16,7 +16,7 @@ const Navbar = () => {
           <div className="flex items-center">
             <h1 className="text-white text-2xl font-bold">📚 Smart Study Buddy</h1>
           </div>
-          
+
           <div className="flex items-center space-x-4">
             <span className="text-white font-medium">
               Hello, {user.username || 'User'}

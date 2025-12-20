@@ -225,7 +225,7 @@ const DocumentViewer = () => {
 
                 <div className="bg-white rounded-xl shadow-lg p-6">
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">
-                        📄 {document?.filename || 'Loading...'}
+                        {document?.type === 'youtube' ? '📹' : '📄'} {document?.filename || document?.title || 'Loading...'}
                     </h2>
 
                     {error && (
@@ -294,7 +294,7 @@ const DocumentViewer = () => {
                                             : 'text-gray-600 hover:text-gray-800'
                                             }`}
                                     >
-                                        📄 View PDF
+                                        {document?.type === 'youtube' ? '📹 View Video' : '📄 View PDF'}
                                     </button>
                                     <button
                                         onClick={() => setActiveTab('summary')}
@@ -317,19 +317,41 @@ const DocumentViewer = () => {
                                 </div>
                             </div>
 
-                            {/* PDF Viewer Tab */}
+                            {/* PDF/Video Viewer Tab */}
                             {activeTab === 'pdf' && (
                                 <div className="space-y-4">
-                                    <div className="bg-gray-100 rounded-lg p-2">
-                                        <iframe
-                                            src={`https://docs.google.com/viewer?url=${encodeURIComponent(document?.downloadUrl)}&embedded=true`}
-                                            className="w-full h-[800px] rounded-lg shadow-lg"
-                                            title="PDF Viewer"
-                                        />
-                                    </div>
-                                    <div className="text-center text-sm text-gray-600">
-                                        <p>💡 Tip: Use the viewer controls to zoom and navigate pages</p>
-                                    </div>
+                                    {document?.type === 'youtube' ? (
+                                        // YouTube Video Player
+                                        <>
+                                            <div className="bg-gray-100 rounded-lg p-2">
+                                                <iframe
+                                                    src={`https://www.youtube.com/embed/${document.videoId}`}
+                                                    className="w-full h-[600px] rounded-lg shadow-lg"
+                                                    title="YouTube Video Player"
+                                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                    allowFullScreen
+                                                />
+                                            </div>
+                                            <div className="text-center text-sm text-gray-600">
+                                                <p>📹 {document.title}</p>
+                                                <p className="text-xs mt-1">Channel: {document.channel}</p>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        // PDF Viewer
+                                        <>
+                                            <div className="bg-gray-100 rounded-lg p-2">
+                                                <iframe
+                                                    src={`https://docs.google.com/viewer?url=${encodeURIComponent(document?.downloadUrl)}&embedded=true`}
+                                                    className="w-full h-[800px] rounded-lg shadow-lg"
+                                                    title="PDF Viewer"
+                                                />
+                                            </div>
+                                            <div className="text-center text-sm text-gray-600">
+                                                <p>💡 Tip: Use the viewer controls to zoom and navigate pages</p>
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             )}
 

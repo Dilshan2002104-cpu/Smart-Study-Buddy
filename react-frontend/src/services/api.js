@@ -13,16 +13,8 @@ apiClient.interceptors.request.use(
         const user = JSON.parse(localStorage.getItem('user') || '{}');
         const token = user.customToken; // Backend returns 'customToken', not 'token'
 
-        console.log('🔍 Interceptor Debug:');
-        console.log('  User object:', user);
-        console.log('  Token:', token);
-        console.log('  Token exists:', !!token);
-
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
-            console.log('  ✅ Authorization header set:', config.headers.Authorization);
-        } else {
-            console.log('  ❌ No token found in localStorage!');
         }
 
         return config;
@@ -130,5 +122,13 @@ export const saveChatHistory = (documentId, userId, chatHistory) => {
 export const getChatHistory = (documentId, userId) => {
     return apiClient.get(`/documents/${documentId}/chat-history`, {
         params: { userId }
+    });
+};
+
+// YouTube Integration
+export const uploadYouTubeVideo = (url, userId) => {
+    return apiClient.post('/youtube/upload', {
+        url,
+        userId
     });
 };

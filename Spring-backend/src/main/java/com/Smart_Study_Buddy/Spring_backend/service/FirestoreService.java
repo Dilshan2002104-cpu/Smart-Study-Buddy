@@ -125,4 +125,26 @@ public class FirestoreService {
         }
         return new ArrayList<>();
     }
+
+    public String saveYouTubeVideo(String userId, String videoId, String title, String channel,
+            String thumbnailUrl, String fullText, Object transcript, double duration)
+            throws ExecutionException, InterruptedException {
+
+        Map<String, Object> videoData = new HashMap<>();
+        videoData.put("type", "youtube");
+        videoData.put("userId", userId);
+        videoData.put("videoId", videoId);
+        videoData.put("filename", title); // Use title as filename for consistency
+        videoData.put("title", title);
+        videoData.put("channel", channel);
+        videoData.put("thumbnailUrl", thumbnailUrl);
+        videoData.put("extractedText", fullText); // Store transcript as extractedText
+        videoData.put("transcript", transcript); // Store full transcript with timestamps
+        videoData.put("duration", duration);
+        videoData.put("uploadDate", new Date());
+        videoData.put("textCached", true); // Transcript is already extracted
+
+        ApiFuture<DocumentReference> future = firestore.collection("documents").add(videoData);
+        return future.get().getId();
+    }
 }
