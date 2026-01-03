@@ -4,10 +4,9 @@
 
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
-[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115.6-009688.svg)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-19.2.0-61DAFB.svg)](https://reactjs.org/)
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 ## 📋 Table of Contents
 
@@ -19,34 +18,33 @@
 - [Installation](#-installation)
 - [Configuration](#-configuration)
 - [Running the Application](#-running-the-application)
-- [API Documentation](#-api-documentation)
+- [Usage](#-usage)
 - [Project Structure](#-project-structure)
-- [Screenshots](#-screenshots)
-- [Contributing](#-contributing)
-- [License](#-license)
+- [Troubleshooting](#-troubleshooting)
 
 ## 🌟 Overview
 
-**Smart Study Buddy** is a comprehensive full-stack application designed to revolutionize the way students learn. By leveraging cutting-edge AI technology, it transforms static study materials into dynamic, interactive learning tools.
+**Smart Study Buddy** is a comprehensive full-stack application designed to revolutionize the way students learn. By leveraging cutting-edge AI technology (Google Gemini 2.0), it transforms static study materials into dynamic, interactive learning tools.
 
 ### What Makes It Special?
 
-- 🤖 **AI-Powered**: Uses Google's Gemini AI for intelligent content analysis
-- 📄 **PDF Support**: Upload and analyze PDF documents
-- 🎥 **YouTube Integration**: Extract and study from YouTube video transcripts
+- 🤖 **AI-Powered**: Uses Google's Gemini 2.0 Flash for intelligent content analysis
+- 📄 **PDF Support**: Upload and analyze PDF documents with separate dashboard
+- 🎥 **YouTube Integration**: Extract and study from YouTube video transcripts with dedicated dashboard
 - 💬 **Interactive Q&A**: Ask questions and get context-aware answers
 - 🎴 **Smart Flashcards**: Auto-generated flashcards for efficient memorization
 - 📝 **Adaptive Quizzes**: AI-generated quizzes to test your knowledge
 - 🔒 **Secure**: Firebase authentication and user data protection
-- 💾 **Cloud Storage**: All your materials safely stored in the cloud
+- 💾 **Cloud Storage**: All your materials safely stored in Firebase
 
 ## ✨ Features
 
-### 📚 Document Management
-- **Upload PDFs**: Drag-and-drop or click to upload study materials
-- **YouTube Videos**: Paste any YouTube URL to extract transcripts
-- **Cloud Storage**: All documents securely stored in Firebase Storage
-- **Quick Access**: View all your materials from a centralized dashboard
+### 📚 Separate Dashboards
+- **PDF Dashboard** (`/pdfs`): Dedicated interface for managing PDF documents with grid layout
+- **YouTube Dashboard** (`/videos`): Dedicated interface for YouTube videos with thumbnail cards
+- **Easy Navigation**: Tab-based navigation between dashboards in the page content
+- **Full-Screen Layout**: Optimized to use full screen width for better content visibility
+- **Sticky Header**: Navigation bar stays fixed at top when scrolling
 
 ### 🧠 AI-Powered Learning Tools
 
@@ -54,32 +52,27 @@
 - Generates concise, student-friendly summaries
 - Uses conversational tone for better understanding
 - Highlights key concepts and takeaways
-- Markdown formatting for readability
 
 #### 2. Interactive Q&A
 - Ask questions about your study materials
 - Context-aware responses based on document content
-- Maintains conversation history for follow-up questions
-- Augmented with broader AI knowledge when needed
+- Maintains conversation history
 
 #### 3. Flashcard Generator
 - Automatically creates 10 flashcards per document
 - Interactive flip animations
-- Track your progress with "Know it" / "Still learning"
-- Shuffle mode for varied practice
+- Track your progress
 
 #### 4. Quiz Generator
 - Generates 10 multiple-choice questions
-- Mixed difficulty levels (easy, medium, hard)
-- Immediate feedback on answers
-- Detailed explanations for correct answers
-- Score tracking and retake options
+- Mixed difficulty levels
+- Immediate feedback with explanations
+- Score tracking
 
 ### 🔐 User Authentication
 - Secure email/password registration
 - Firebase-powered authentication
 - Protected routes and user-specific data
-- Session management with custom tokens
 
 ## 🏗️ Architecture
 
@@ -98,116 +91,73 @@ Smart Study Buddy follows a modern **three-tier microservices architecture**:
 │              Spring Boot + Firebase                         │
 │                    (Port 8080)                              │
 └────────────┬───────────────────────┬────────────────────────┘
-             │                       │
-             │ HTTP/REST             │ Firebase SDK
+             │ HTTP/REST             │ Firebase Admin SDK
              ▼                       ▼
-┌────────────────────────┐  ┌──────────────────────┐
-│   AI Service Layer     │  │  External Services   │
-│  Python + FastAPI      │  │  - Firestore DB      │
-│     (Port 8000)        │  │  - Firebase Storage  │
-└──────────┬─────────────┘  │  - Firebase Auth     │
-           │                └──────────────────────┘
-           │ Google Cloud SDK
-           ▼
-┌────────────────────────┐
-│   Google Vertex AI     │
-│   (Gemini Models)      │
+┌────────────────────────┐  ┌──────────────────────────────┐
+│   AI Service Layer     │  │   Firebase Services          │
+│   Python + FastAPI     │  │   - Authentication           │
+│   (Port 8000)          │  │   - Firestore Database       │
+│   - Gemini AI          │  │   - Cloud Storage            │
+│   - PDF Processing     │  └──────────────────────────────┘
+│   - YouTube Transcripts│
 └────────────────────────┘
-```
-
-### Data Flow Example: Document Upload & Summary
-
-```mermaid
-sequenceDiagram
-    participant User
-    participant React
-    participant Spring
-    participant Python
-    participant Firebase
-    participant Gemini
-
-    User->>React: Upload PDF
-    React->>Spring: POST /api/documents/upload
-    Spring->>Firebase: Store file
-    Firebase-->>Spring: Download URL
-    Spring->>Firebase: Save metadata (Firestore)
-    Spring-->>React: Document ID
-    React->>Spring: Request summary
-    Spring->>Python: POST /api/ai/summarize
-    Python->>Gemini: Generate summary
-    Gemini-->>Python: AI response
-    Python-->>Spring: Summary text
-    Spring-->>React: Display summary
-    React-->>User: Show results
 ```
 
 ## 🛠️ Tech Stack
 
 ### Frontend
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| React | 19.2.0 | UI framework |
-| Vite | 7.2.4 | Build tool & dev server |
-| React Router | 7.10.1 | Client-side routing |
-| Axios | 1.13.2 | HTTP client |
-| Tailwind CSS | 3.4.19 | Styling framework |
-| React-PDF | 10.2.0 | PDF rendering |
+- **React 19.2.0**: Modern UI library
+- **Vite 7.2.4**: Lightning-fast build tool
+- **React Router 7.10.1**: Client-side routing
+- **Tailwind CSS 3.4.19**: Utility-first CSS framework
+- **Axios 1.13.2**: HTTP client
+- **React-PDF 10.2.0**: PDF rendering
 
-### Backend (Spring Boot)
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| Spring Boot | 3.2.0 | Backend framework |
-| Java | 21 | Programming language |
-| Spring Security | - | Authentication & authorization |
-| Firebase Admin SDK | 9.2.0 | Firebase integration |
-| Apache PDFBox | 3.0.0 | PDF processing |
-| OkHttp | 4.12.0 | HTTP client |
+### Backend
+- **Spring Boot 3.2.0**: Java framework
+- **Java 21**: Programming language
+- **Spring Security**: Authentication & authorization
+- **Firebase Admin SDK 9.2.0**: Firebase integration
+- **Apache PDFBox 3.0.0**: PDF processing
+- **OkHttp 4.12.0**: HTTP client
 
-### AI Service (Python)
-| Technology | Version | Purpose |
-|------------|---------|---------|
-| FastAPI | 0.115.6 | API framework |
-| Uvicorn | 0.32.1 | ASGI server |
-| Google Cloud AI Platform | 1.38.0 | Vertex AI integration |
-| PyPDF2 | 3.0.1 | PDF text extraction |
-| yt-dlp | 2025.12.8 | YouTube transcript extraction |
-| Pydantic | 2.10.3 | Data validation |
+### AI Service
+- **FastAPI 0.115.6**: Modern Python web framework
+- **Python 3.12+**: Programming language
+- **Google Cloud AI Platform 1.38.0**: Vertex AI integration
+- **Gemini 2.0 Flash Exp**: AI model
+- **PyPDF2 3.0.1**: PDF text extraction
+- **yt-dlp 2025.12.8**: YouTube transcript extraction
 
 ### Infrastructure
-- **Database**: Google Firestore (NoSQL)
-- **Storage**: Firebase Storage
-- **Authentication**: Firebase Authentication
-- **AI**: Google Vertex AI (Gemini 1.5 Flash)
+- **Firebase Authentication**: User management
+- **Firebase Firestore**: NoSQL database
+- **Firebase Storage**: File storage
+- **Google Vertex AI**: AI/ML platform
 
 ## 📦 Prerequisites
 
 Before you begin, ensure you have the following installed:
 
-- **Java Development Kit (JDK) 21** or higher
-  - [Download JDK](https://www.oracle.com/java/technologies/downloads/)
-  - Verify: `java -version`
+- **Java 21** or higher ([Download](https://www.oracle.com/java/technologies/downloads/))
+- **Python 3.12** or higher ([Download](https://www.python.org/downloads/))
+- **Node.js 18+** and npm ([Download](https://nodejs.org/))
+- **Git** ([Download](https://git-scm.com/))
 
-- **Maven 3.6+** (usually comes with JDK)
-  - Verify: `mvn -version`
+### Cloud Services Required
 
-- **Python 3.8+**
-  - [Download Python](https://www.python.org/downloads/)
-  - Verify: `python --version`
+1. **Google Cloud Platform Account**
+   - Create a project
+   - Enable Vertex AI API
+   - Create a service account with Vertex AI permissions
+   - Download the service account key JSON
 
-- **Node.js 16+** and npm
-  - [Download Node.js](https://nodejs.org/)
-  - Verify: `node -v` and `npm -v`
-
-- **Firebase Project**
-  - Create a project at [Firebase Console](https://console.firebase.google.com/)
-  - Enable Firestore Database
-  - Enable Firebase Storage
-  - Enable Firebase Authentication (Email/Password)
-
-- **Google Cloud Project**
-  - Create a project at [Google Cloud Console](https://console.cloud.google.com/)
-  - Enable Vertex AI API
-  - Create a service account with Vertex AI permissions
+2. **Firebase Project**
+   - Create a Firebase project
+   - Enable Authentication (Email/Password)
+   - Create Firestore database
+   - Enable Firebase Storage
+   - Download Firebase service account key JSON
 
 ## 🚀 Installation
 
@@ -218,596 +168,246 @@ git clone https://github.com/yourusername/Smart-Study-Buddy.git
 cd Smart-Study-Buddy
 ```
 
-### 2. Set Up Firebase
+### 2. Install Dependencies
 
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Create a new project or select existing one
-3. Navigate to **Project Settings** → **Service Accounts**
-4. Click **Generate New Private Key**
-5. Save the JSON file as `service-account-key.json`
-6. Place it in a secure location (DO NOT commit to Git)
+#### Python AI Service
+```bash
+cd python-ai-service
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+pip install -r requirements.txt
+cd ..
+```
 
-### 3. Set Up Google Cloud (Vertex AI)
+#### React Frontend
+```bash
+cd react-frontend
+npm install
+cd ..
+```
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com/)
-2. Enable **Vertex AI API**
-3. Create a service account with **Vertex AI User** role
-4. Generate and download the JSON key
-5. You can use the same service account key as Firebase if both are in the same project
+#### Spring Backend
+Maven dependencies will be downloaded automatically when you run the application.
 
 ## ⚙️ Configuration
 
-### Spring Backend Configuration
+### 1. Vertex AI Configuration
 
-1. Navigate to the Spring backend directory:
-```bash
-cd Spring-backend
-```
+1. Place your Vertex AI service account key in the project root:
+   ```
+   Smart-Study-Buddy/vertex-ai-key.json
+   ```
 
-2. Create `src/main/resources/application.properties`:
-```properties
-server.port=8080
-spring.servlet.multipart.max-file-size=50MB
-spring.servlet.multipart.max-request-size=50MB
-```
+2. Update `python-ai-service/.env`:
+   ```env
+   GOOGLE_APPLICATION_CREDENTIALS=/absolute/path/to/vertex-ai-key.json
+   VERTEX_AI_PROJECT_ID=your-project-id
+   VERTEX_AI_LOCATION=us-central1
+   VERTEX_AI_MODEL=gemini-2.0-flash-exp
+   ```
 
-3. Set environment variable for Firebase credentials:
+### 2. Firebase Configuration
 
-**Windows (PowerShell):**
-```powershell
-$env:GOOGLE_APPLICATION_CREDENTIALS="C:\path\to\service-account-key.json"
-```
+1. Place your Firebase service account key in the project root:
+   ```
+   Smart-Study-Buddy/firebase-service-account-key.json
+   ```
 
-**macOS/Linux:**
-```bash
-export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account-key.json"
-```
+2. Copy the key to Spring resources:
+   ```bash
+   cp firebase-service-account-key.json Spring-backend/src/main/resources/serviceAccountKey.json
+   ```
 
-### Python AI Service Configuration
+3. Update `Spring-backend/src/main/resources/application.properties`:
+   ```properties
+   firebase.service-account-key=classpath:serviceAccountKey.json
+   firebase.storage-bucket=your-project-id.firebasestorage.app
+   ```
 
-1. Navigate to the Python service directory:
-```bash
-cd python-ai-service
-```
-
-2. Create a `.env` file:
-```env
-VERTEX_AI_PROJECT_ID=your-google-cloud-project-id
-VERTEX_AI_LOCATION=us-central1
-VERTEX_AI_MODEL=gemini-1.5-flash-002
-GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account-key.json
-```
-
-3. Install Python dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-### React Frontend Configuration
-
-1. Navigate to the React frontend directory:
-```bash
-cd react-frontend
-```
-
-2. Install dependencies:
-```bash
-npm install
-```
-
-3. (Optional) Update API URLs in `src/services/api.js` if needed:
-```javascript
-const API_URL = "http://localhost:8080/api";
-```
+4. Configure Firebase Storage Rules (in Firebase Console):
+   ```javascript
+   rules_version = '2';
+   service firebase.storage {
+     match /b/{bucket}/o {
+       match /users/{userId}/{allPaths=**} {
+         allow read, write: if request.auth != null && request.auth.uid == userId;
+       }
+     }
+   }
+   ```
 
 ## 🏃 Running the Application
 
-You need to start all three services. Open **three separate terminal windows**:
+You need to run all three services simultaneously in separate terminals:
 
-### Terminal 1: Start Spring Backend
-
-```bash
-cd Spring-backend
-./mvnw spring-boot:run
-```
-
-**Windows:**
-```powershell
-cd Spring-backend
-.\mvnw.cmd spring-boot:run
-```
-
-✅ Backend running at: `http://localhost:8080`
-
-### Terminal 2: Start Python AI Service
-
+### Terminal 1: Python AI Service
 ```bash
 cd python-ai-service
+source venv/bin/activate  # On Windows: venv\Scripts\activate
 uvicorn main:app --reload --port 8000
 ```
 
-✅ AI Service running at: `http://localhost:8000`
-📚 API Docs available at: `http://localhost:8000/docs`
+### Terminal 2: Spring Backend
+```bash
+cd Spring-backend
+export GOOGLE_APPLICATION_CREDENTIALS="/absolute/path/to/firebase-service-account-key.json"
+./mvnw spring-boot:run
+```
 
-### Terminal 3: Start React Frontend
-
+### Terminal 3: React Frontend
 ```bash
 cd react-frontend
 npm run dev
 ```
 
-✅ Frontend running at: `http://localhost:5173`
-
-### 🎉 Access the Application
+### Access the Application
 
 Open your browser and navigate to:
 ```
 http://localhost:5173
 ```
 
-## 📖 API Documentation
+## 📖 Usage
 
-### Authentication Endpoints
+### Getting Started
 
-#### Register User
-```http
-POST /api/auth/register
-Content-Type: application/json
+1. **Register**: Create an account with email and password
+2. **Login**: Sign in to access your dashboard
 
-{
-  "username": "johndoe",
-  "email": "john@example.com",
-  "password": "securePassword123"
-}
-```
+### Managing PDFs
 
-**Response:**
-```json
-{
-  "userId": "firebase-uid",
-  "email": "john@example.com",
-  "username": "johndoe",
-  "customToken": "eyJhbGc..."
-}
-```
+1. Navigate to **"📄 My PDFs"** dashboard
+2. Click **"Upload PDF Document"**
+3. Select your PDF file (max 10MB)
+4. Click **"🤖 View & Study"** to:
+   - Generate AI summary
+   - Ask questions
+   - Create flashcards
+   - Take quizzes
 
-#### Login
-```http
-POST /api/auth/login
-Content-Type: application/json
+### Managing YouTube Videos
 
-{
-  "email": "john@example.com",
-  "password": "securePassword123"
-}
-```
+1. Navigate to **"📹 My Videos"** dashboard
+2. Click **"Add YouTube Video"**
+3. Paste the YouTube URL
+4. Click **"🤖 View & Study"** to:
+   - Read the transcript
+   - Generate summary
+   - Ask questions about the video
+   - Create flashcards
+   - Take quizzes
 
-### Document Endpoints
+### AI Features
 
-#### Upload PDF
-```http
-POST /api/documents/upload
-Authorization: Bearer {token}
-Content-Type: multipart/form-data
+- **Summary**: Click "Generate Summary" for a concise overview
+- **Q&A**: Type your question and get AI-powered answers
+- **Flashcards**: Click "Generate Flashcards" for 10 study cards
+- **Quiz**: Click "Generate Quiz" for 10 multiple-choice questions
 
-file: [PDF file]
-userId: "user-id"
-```
-
-#### Get User Documents
-```http
-GET /api/documents?userId={userId}
-Authorization: Bearer {token}
-```
-
-#### Get Document Content
-```http
-GET /api/documents/{documentId}/content?userId={userId}
-Authorization: Bearer {token}
-```
-
-#### Delete Document
-```http
-DELETE /api/documents/{documentId}?userId={userId}
-Authorization: Bearer {token}
-```
-
-### AI Endpoints
-
-#### Generate Summary
-```http
-POST /api/ai/summarize
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "text": "Document text to summarize...",
-  "document_id": "doc-id"
-}
-```
-
-#### Ask Question
-```http
-POST /api/ai/ask
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "text": "Document context...",
-  "question": "What is the main topic?",
-  "document_id": "doc-id",
-  "chat_history": [
-    {
-      "question": "Previous question",
-      "answer": "Previous answer"
-    }
-  ]
-}
-```
-
-#### Generate Flashcards
-```http
-POST /api/ai/flashcards
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "text": "Document text...",
-  "document_id": "doc-id"
-}
-```
-
-**Response:**
-```json
-{
-  "flashcards": [
-    {
-      "question": "What is photosynthesis?",
-      "answer": "The process by which plants convert light energy into chemical energy."
-    }
-  ],
-  "count": 10
-}
-```
-
-#### Generate Quiz
-```http
-POST /api/ai/generate-quiz
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "text": "Document text...",
-  "document_id": "doc-id"
-}
-```
-
-**Response:**
-```json
-{
-  "quiz": [
-    {
-      "question": "What is the primary function of mitochondria?",
-      "options": [
-        "Energy production",
-        "Protein synthesis",
-        "DNA replication",
-        "Waste removal"
-      ],
-      "correctAnswer": 0,
-      "explanation": "Mitochondria are known as the powerhouse of the cell..."
-    }
-  ],
-  "count": 10
-}
-```
-
-### YouTube Endpoints
-
-#### Upload YouTube Video
-```http
-POST /api/youtube/upload
-Authorization: Bearer {token}
-Content-Type: application/json
-
-{
-  "url": "https://www.youtube.com/watch?v=VIDEO_ID",
-  "userId": "user-id"
-}
-```
-
-## 📂 Project Structure
+## 📁 Project Structure
 
 ```
 Smart-Study-Buddy/
-│
-├── Spring-backend/                 # Java Spring Boot Backend
+├── react-frontend/              # React frontend application
 │   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/com/Smart_Study_Buddy/Spring_backend/
-│   │   │   │   ├── config/        # Configuration classes
-│   │   │   │   ├── controller/    # REST controllers
-│   │   │   │   ├── dto/           # Data Transfer Objects
-│   │   │   │   ├── security/      # Security filters
-│   │   │   │   └── service/       # Business logic services
-│   │   │   └── resources/
-│   │   │       └── application.properties
-│   │   └── test/
-│   └── pom.xml                    # Maven dependencies
-│
-├── python-ai-service/             # Python FastAPI AI Service
-│   ├── main.py                    # FastAPI application
-│   ├── requirements.txt           # Python dependencies
-│   ├── .env                       # Environment variables
-│   ├── models/
-│   │   └── schemas.py            # Pydantic models
-│   └── services/
-│       ├── gemini_service.py     # Gemini AI integration
-│       ├── pdf_service.py        # PDF processing
-│       ├── smart_summarizer.py   # Advanced summarization
-│       └── youtube_service.py    # YouTube integration
-│
-├── react-frontend/                # React Frontend
-│   ├── src/
-│   │   ├── components/           # React components
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── DocumentViewer.jsx
-│   │   │   ├── Flashcards.jsx
-│   │   │   ├── Quiz.jsx
-│   │   │   ├── Login.jsx
-│   │   │   ├── Register.jsx
-│   │   │   └── ...
+│   │   ├── components/
+│   │   │   ├── PDFDashboard.jsx      # PDF documents dashboard
+│   │   │   ├── YouTubeDashboard.jsx  # YouTube videos dashboard
+│   │   │   ├── Navbar.jsx            # Sticky navigation bar
+│   │   │   ├── DocumentViewer.jsx    # Document viewer with AI tools
+│   │   │   ├── Flashcards.jsx        # Flashcard interface
+│   │   │   └── Quiz.jsx              # Quiz interface
 │   │   ├── services/
-│   │   │   └── api.js           # API client
-│   │   ├── App.jsx              # Main app component
-│   │   └── main.jsx             # Entry point
-│   ├── package.json             # NPM dependencies
-│   ├── vite.config.js          # Vite configuration
-│   └── tailwind.config.js      # Tailwind CSS config
+│   │   │   └── api.js                # API client
+│   │   └── App.jsx                   # Main app component
+│   └── package.json
 │
-├── .gitignore
+├── Spring-backend/              # Spring Boot backend
+│   ├── src/main/java/com/Smart_Study_Buddy/
+│   │   ├── controller/
+│   │   │   ├── AuthController.java   # Authentication endpoints
+│   │   │   └── DocumentController.java # Document management
+│   │   ├── service/
+│   │   │   ├── FirestoreService.java # Firestore operations
+│   │   │   └── StorageService.java   # Firebase Storage
+│   │   └── security/
+│   │       └── FirebaseAuthenticationFilter.java
+│   └── pom.xml
+│
+├── python-ai-service/           # Python AI service
+│   ├── main.py                  # FastAPI application
+│   ├── services/
+│   │   ├── gemini_service.py    # Gemini AI integration
+│   │   ├── pdf_service.py       # PDF processing
+│   │   └── youtube_service.py   # YouTube transcript extraction
+│   ├── requirements.txt
+│   └── .env
+│
+├── vertex-ai-key.json          # Vertex AI credentials (gitignored)
+├── firebase-service-account-key.json  # Firebase credentials (gitignored)
 └── README.md
-```
-
-## 📸 Screenshots
-
-### Dashboard
-![Dashboard](docs/images/dashboard.png)
-*Main dashboard showing uploaded documents and YouTube videos*
-
-### Document Viewer with AI Summary
-![Document Viewer](docs/images/document-viewer.png)
-*PDF viewer with AI-generated summary and Q&A interface*
-
-### Interactive Flashcards
-![Flashcards](docs/images/flashcards.png)
-*Flip-style flashcards with progress tracking*
-
-### AI-Generated Quiz
-![Quiz](docs/images/quiz.png)
-*Multiple-choice quiz with immediate feedback*
-
-## 🔧 Development
-
-### Running Tests
-
-**Spring Backend:**
-```bash
-cd Spring-backend
-./mvnw test
-```
-
-**Python AI Service:**
-```bash
-cd python-ai-service
-pytest
-```
-
-**React Frontend:**
-```bash
-cd react-frontend
-npm test
-```
-
-### Code Formatting
-
-**Java (Spring Boot):**
-```bash
-./mvnw spring-javaformat:apply
-```
-
-**Python:**
-```bash
-black .
-flake8 .
-```
-
-**JavaScript/React:**
-```bash
-npm run lint
 ```
 
 ## 🐛 Troubleshooting
 
 ### Common Issues
 
-#### 1. Firebase Authentication Error
-**Error:** `401 Unauthorized` or `Firebase app not initialized`
+#### 1. Vertex AI Model Not Found
+**Error**: `404 Publisher Model not found`
 
-**Solution:**
-- Verify `GOOGLE_APPLICATION_CREDENTIALS` environment variable is set correctly
-- Ensure service account key JSON file exists and has correct permissions
-- Check Firebase project settings
+**Solution**: Update the model name in `python-ai-service/.env`:
+```env
+VERTEX_AI_MODEL=gemini-2.0-flash-exp
+```
 
-#### 2. Vertex AI Model Not Found
-**Error:** `Model not found` or `Permission denied`
+#### 2. Firebase Storage Bucket Error
+**Error**: `Bucket does not exist`
 
-**Solution:**
-- Verify Vertex AI API is enabled in Google Cloud Console
-- Check service account has `Vertex AI User` role
-- Ensure `VERTEX_AI_PROJECT_ID` matches your Google Cloud project
-- Verify model name is correct: `gemini-1.5-flash-002`
+**Solution**: 
+- Check `application.properties` has correct bucket name
+- Verify Firebase Storage is enabled in Firebase Console
+- Update storage rules to allow authenticated access
 
-#### 3. CORS Errors
-**Error:** `CORS policy: No 'Access-Control-Allow-Origin' header`
+#### 3. Port Already in Use
+**Error**: `Address already in use`
 
-**Solution:**
-- Check `CorsConfig.java` in Spring backend
-- Verify frontend URL is in allowed origins
-- Ensure both services are running on correct ports
-
-#### 4. PDF Upload Fails
-**Error:** `File too large` or `Upload failed`
-
-**Solution:**
-- Check file size limit in `application.properties`
-- Verify Firebase Storage rules allow uploads
-- Ensure user is authenticated
-
-#### 5. YouTube Transcript Extraction Fails
-**Error:** `Transcript not available`
-
-**Solution:**
-- Verify video has captions/subtitles enabled
-- Check if video is publicly accessible
-- Try a different video URL format
-
-### Logs
-
-**View Spring Boot logs:**
+**Solution**:
 ```bash
-cd Spring-backend
-tail -f logs/spring-boot-application.log
+# Find and kill process on port
+sudo lsof -i :8000  # or :8080 or :5173
+sudo kill -9 <PID>
 ```
 
-**View Python service logs:**
+#### 4. Python Dependencies Installation Error
+**Error**: `externally-managed-environment`
+
+**Solution**: Use virtual environment:
 ```bash
-cd python-ai-service
-# Logs appear in terminal where uvicorn is running
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
 ```
 
-**View React dev server logs:**
-```bash
-cd react-frontend
-# Logs appear in terminal where Vite is running
-```
+### Getting Help
 
-## 🚀 Deployment
-
-### Docker Deployment (Recommended)
-
-Create `docker-compose.yml`:
-
-```yaml
-version: '3.8'
-
-services:
-  backend:
-    build: ./Spring-backend
-    ports:
-      - "8080:8080"
-    environment:
-      - GOOGLE_APPLICATION_CREDENTIALS=/app/service-account-key.json
-    volumes:
-      - ./service-account-key.json:/app/service-account-key.json
-
-  ai-service:
-    build: ./python-ai-service
-    ports:
-      - "8000:8000"
-    environment:
-      - VERTEX_AI_PROJECT_ID=${VERTEX_AI_PROJECT_ID}
-      - VERTEX_AI_LOCATION=${VERTEX_AI_LOCATION}
-      - VERTEX_AI_MODEL=${VERTEX_AI_MODEL}
-    volumes:
-      - ./service-account-key.json:/app/service-account-key.json
-
-  frontend:
-    build: ./react-frontend
-    ports:
-      - "80:80"
-    depends_on:
-      - backend
-      - ai-service
-```
-
-Run:
-```bash
-docker-compose up -d
-```
-
-### Cloud Deployment Options
-
-- **Google Cloud Run**: Deploy containerized services
-- **AWS Elastic Beanstalk**: For Spring Boot backend
-- **Vercel/Netlify**: For React frontend
-- **Heroku**: For all services
+If you encounter issues:
+1. Check the logs in each service terminal
+2. Verify all environment variables are set correctly
+3. Ensure all three services are running
+4. Check Firebase Console for authentication/storage issues
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please follow these steps:
-
-1. **Fork the repository**
-2. **Create a feature branch**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Commit your changes**
-   ```bash
-   git commit -m 'Add some amazing feature'
-   ```
-4. **Push to the branch**
-   ```bash
-   git push origin feature/amazing-feature
-   ```
-5. **Open a Pull Request**
-
-### Coding Standards
-
-- Follow existing code style
-- Write meaningful commit messages
-- Add tests for new features
-- Update documentation as needed
+Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License.
 
-## 👥 Authors
+## 👨‍💻 Author
 
-- **Your Name** - *Initial work* - [YourGitHub](https://github.com/yourusername)
-
-## 🙏 Acknowledgments
-
-- Google Gemini AI for powerful language models
-- Firebase for authentication and storage
-- Spring Boot community
-- FastAPI community
-- React community
-
-## 📞 Support
-
-For support, email support@smartstudybuddy.com or open an issue in the GitHub repository.
-
-## 🗺️ Roadmap
-
-- [ ] Mobile app (React Native)
-- [ ] Collaborative study sessions
-- [ ] Voice-to-text note taking
-- [ ] Integration with more video platforms
-- [ ] Advanced analytics and progress tracking
-- [ ] Spaced repetition algorithm for flashcards
-- [ ] Export study materials to various formats
-- [ ] Dark mode support
+Created with ❤️ by Dilshan
 
 ---
 
-<div align="center">
-
-**Made with ❤️ by students, for students**
-
-⭐ Star this repo if you find it helpful!
-
-[Report Bug](https://github.com/yourusername/Smart-Study-Buddy/issues) · [Request Feature](https://github.com/yourusername/Smart-Study-Buddy/issues)
-
-</div>
+**Happy Studying! 📚✨**

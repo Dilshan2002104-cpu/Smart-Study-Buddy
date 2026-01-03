@@ -17,7 +17,7 @@ const Login = () => {
     try {
       const response = await loginUser(email, password);
       localStorage.setItem('user', JSON.stringify(response.data));
-      navigate('/dashboard');
+      navigate('/pdfs');
     } catch (err) {
       setError('Invalid email or password');
     } finally {

@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
+import PDFDashboard from './components/PDFDashboard';
+import YouTubeDashboard from './components/YouTubeDashboard';
 import DocumentViewer from './components/DocumentViewer';
 import Flashcards from './components/Flashcards';
 import Quiz from './components/Quiz';
@@ -13,14 +15,31 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+
+        {/* New separate dashboards */}
         <Route
-          path="/dashboard"
+          path="/pdfs"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <PDFDashboard />
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/videos"
+          element={
+            <ProtectedRoute>
+              <YouTubeDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Old dashboard route - redirect to PDFs */}
+        <Route
+          path="/dashboard"
+          element={<Navigate to="/pdfs" replace />}
+        />
+
         <Route
           path="/document/:documentId"
           element={
